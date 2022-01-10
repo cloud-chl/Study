@@ -1677,7 +1677,7 @@ cat > /opt/kubernetes/cfg/kubelet.conf << EOF
 KUBELET_OPTS="--logtostderr=false \\
 --v=2 \\
 --log-dir=/opt/kubernetes/logs \\
---hostname-override=k8s-master1 \\
+--hostname-override=k8s-master \\
 --network-plugin=cni \\
 --kubeconfig=/opt/kubernetes/cfg/kubelet.kubeconfig \\
 --bootstrap-kubeconfig=/opt/kubernetes/cfg/bootstrap.kubeconfig \\
@@ -1929,6 +1929,22 @@ kubectl get node
 NAME         STATUS   ROLES    AGE   VERSION
 k8s-master   Ready    <none>   37m   v1.20.13
 ```
+
+> 部署calico之后，status是running，但是ready始终不行，错误如下
+
+![calico-error](.\Kubernetes\calico-error.png)
+
+>解决：通过ip link查看有多余的一张无用的tunl0网卡，将这个网卡移除
+>
+>lsmod | grep ipip  //找到是否存在ipip模块
+>
+>modprobe -r ipip  //移除ipip模块，tunl0就消失了
+>
+>重新applycalico.yaml文件，即可初始化成功
+
+![calico-error2](E:\linux笔记\Linux\Kubernetes\calico-error2.png)
+
+![calico-error3](E:\linux笔记\Linux\Kubernetes\calico-error3.png)
 
 #### 6.5 授权apiserver访问kubelet
 
